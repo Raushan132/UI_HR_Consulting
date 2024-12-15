@@ -4,6 +4,7 @@ import { customFormData } from '../utils/CustomFormData';
 import CountdownTimer from '../utils/CountDown';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { baseUrl } from '../utils/BaseUrl';
 
 const modelStyle = {
   position: 'absolute',
@@ -43,7 +44,7 @@ const Register = () => {
     setOtpSend(true);
     setTimeLeft(TIMER)
 
-    if (isCurrentEmailVerification = currentVerification.EMAIL) {
+    if (isCurrentEmailVerification === currentVerification.EMAIL) {
       try {
 
         const res = await axios.post(`${baseUrl}/register/emailOtp`, { emailId: formData.emailId }, {
