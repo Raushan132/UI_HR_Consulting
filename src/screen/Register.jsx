@@ -25,6 +25,7 @@ const Register = () => {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState(customFormData)
   const [errorData, setErrorData] = useState(customFormData)
+  const [otp,setOtp] =useState('')
   const [isOtpVerified, setOtpVerified] = useState({ isEmailVerified: false, isMobileVerified: false })
   const [isCurrentEmailVerification, setCurrentEmailVerification] = useState(currentVerification.EMAIL);
   const [isOtpSend, setOtpSend] = useState(false);
@@ -54,12 +55,69 @@ const Register = () => {
         })
         console.log(res.data);
         toast.info('otp send')
-        handleClose();
+        
       } catch (err) {
         console.log(err);
       }
 
     }
+    else if (isCurrentEmailVerification === currentVerification.MOBILE) {
+      try {
+
+        const res = await axios.post(`${baseUrl}/register/emailOtp`, { mobileNumber: formData.mobileNo }, {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+        console.log(res.data);
+        toast.info('otp send')
+        
+      } catch (err) {
+        console.log(err);
+      }
+
+    }
+
+  }
+
+  const handleOTPVerificationBtn = async ()=>{
+
+      if(isCurrentEmailVerification=== currentVerification.EMAIL){
+        try {
+
+          const res = await axios.post(`${baseUrl}/register/emailOtpVerify`, { emailId: formData.emailId,otp:otp }, {
+            headers: {
+              "Content-Type": "application/json"
+            }
+          })
+          console.log(res.data);
+          toast.success('otp verified')
+          handleClose();
+          setOtpVerified(prev=>({...prev,isEmailVerified:true}));
+          
+        } catch (err) {
+          console.log(err);
+          toast.error('wrong otp')
+        }
+      }
+      else if(isCurrentEmailVerification=== currentVerification.MOBILE){
+        try {
+
+          const res = await axios.post(`${baseUrl}/register/OtpVerify`, { mobileNumber: formData.mobileNo,otp:otp }, {
+            headers: {
+              "Content-Type": "application/json"
+            }
+          })
+          console.log(res.data);
+          toast.success('otp verified')
+          handleClose();
+          setOtpVerified(prev=>({...prev,isMobileVerified:true}));
+          
+        } catch (err) {
+          console.log(err);
+          toast.error('wrong otp')
+        }
+      }
 
 
   }
@@ -284,15 +342,17 @@ const Register = () => {
                     label="Enter OTP"
                     size='small'
                     helperText=""
+                    value={otp}
+                    onChange={(e)=>setOtp(e.target.value)}
 
                   />
                 </Box>
                 <Box sx={{ alignSelf: 'end', display: 'flex', gap: 2 }}>
                   <Box>
-                    <Button variant="contained" size='small' >Verify</Button>
+                    <Button variant="contained" size='small' onClick={handleOTPVerificationBtn}>Verify</Button>
                   </Box>
                   {timeLeft === 0 && <Box>
-                    <Button variant="outlined" size='small'>Resend</Button>
+                    <Button variant="outlined" size='small' onClick={handleOTPSendBtn}>Resend</Button>
                   </Box>}
                 </Box>
               </Box>
