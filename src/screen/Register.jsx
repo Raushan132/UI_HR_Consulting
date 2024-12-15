@@ -2,6 +2,8 @@ import { Box, Button, Modal, TextField, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import { customFormData } from '../utils/CustomFormData';
 import CountdownTimer from '../utils/CountDown';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const modelStyle = {
   position: 'absolute',
@@ -18,14 +20,14 @@ const modelStyle = {
 const Register = () => {
 
   const currentVerification = { EMAIL: true, MOBILE: false }
-  const TIMER =10;
+  const TIMER = 10;
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState(customFormData)
   const [errorData, setErrorData] = useState(customFormData)
   const [isOtpVerified, setOtpVerified] = useState({ isEmailVerified: false, isMobileVerified: false })
   const [isCurrentEmailVerification, setCurrentEmailVerification] = useState(currentVerification.EMAIL);
   const [isOtpSend, setOtpSend] = useState(false);
-   const [timeLeft, setTimeLeft] = useState(TIMER); // Initialize 2 minutes (120 seconds)
+  const [timeLeft, setTimeLeft] = useState(TIMER); // Initialize 2 minutes (120 seconds)
 
   const handleFillFormData = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -37,9 +39,28 @@ const Register = () => {
     console.log(formData);
   }
 
-  const handleOTPSendBtn = () => {
+  const handleOTPSendBtn = async () => {
     setOtpSend(true);
     setTimeLeft(TIMER)
+
+    if (isCurrentEmailVerification = currentVerification.EMAIL) {
+      try {
+
+        const res = await axios.post(`${baseUrl}/register/emailOtp`, { emailId: formData.emailId }, {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+        console.log(res.data);
+        toast.info('otp send')
+        handleClose();
+      } catch (err) {
+        console.log(err);
+      }
+
+    }
+
+
   }
 
   const handleOpen = (type) => {
@@ -218,8 +239,8 @@ const Register = () => {
               <Typography id="keep-mounted-modal-title" variant="h6" component="h2">
                 OTP Check
               </Typography>
-             { isOtpSend && <Typography id="keep-mounted-modal-title" variant="h6" component="h2">
-                <CountdownTimer timeLeft={timeLeft} setTimeLeft={setTimeLeft}/>
+              {isOtpSend && <Typography id="keep-mounted-modal-title" variant="h6" component="h2">
+                <CountdownTimer timeLeft={timeLeft} setTimeLeft={setTimeLeft} />
               </Typography>}
             </Box>
 
@@ -265,11 +286,11 @@ const Register = () => {
 
                   />
                 </Box>
-                <Box sx={{ alignSelf: 'end',display:'flex',gap:2 }}>
+                <Box sx={{ alignSelf: 'end', display: 'flex', gap: 2 }}>
                   <Box>
-                    <Button variant="contained" size='small'>Verify</Button>
+                    <Button variant="contained" size='small' >Verify</Button>
                   </Box>
-                 {timeLeft===0 && <Box>
+                  {timeLeft === 0 && <Box>
                     <Button variant="outlined" size='small'>Resend</Button>
                   </Box>}
                 </Box>
